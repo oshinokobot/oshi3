@@ -20,7 +20,7 @@ def getRandomFile():
     file_id = file_list[0]['id']
     file = drive.CreateFile({'id': file_id})
     
-    extension = title.split(".")[1]
+    extension = title[-3:]
 
     file.GetContentFile(title)
 
