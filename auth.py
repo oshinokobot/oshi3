@@ -29,6 +29,12 @@ def getTwitterAuth():
 def getGoogleAuth():
 
     gauth = GoogleAuth()
+
+    gauth.LocalWebserverAuth()
+
+    if gauth.access_token_expired:
+        gauth.Refresh()
+
     drive_auth = GoogleDrive(gauth)
 
     return drive_auth

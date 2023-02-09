@@ -5,10 +5,9 @@ from image_upload import ImageTweet
 from video_upload import VideoTweet
 from utilities import *
 
-from flask import Flask
-from apscheduler.schedulers.background import BackgroundScheduler
+from auth import *
 
-scheduler = BackgroundScheduler()
+from flask import Flask
 
 app = Flask(__name__)
 
@@ -20,6 +19,11 @@ def hello():
 @app.route('/health')
 def health():
     tweet()
+    return '200 OK'
+
+@app.route('/auth')
+def auth():
+    getGoogleAuth()
     return '200 OK'
 
 
