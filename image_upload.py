@@ -1,40 +1,36 @@
 import os
-import requests
+from dotenv import load_dotenv
+import tweepy
 
-from auth import *
+class ImageTweet:
 
-class ImageTweet(object):
+    def __init__(self):
+        load_dotenv()
+        self.api_key = os.getenv('CONSUMER_KEY')
+        self.api_secret = os.getenv('CONSUMER_SECRET')
+        self.access_token = os.getenv('ACCESS_TOKEN')
+        self.access_token_secret = os.getenv('ACCESS_TOKEN_SECRET')
 
-    def __init__(self, filename):
-		
-        '''
-        Defines image tweet properties
-        '''
-        self.image_filename = filename
-        self.total_bytes = os.path.getsize(self.image_filename)
-        self.media_id = None
-        self.processing_info = None
-        self.oauth = getTwitterAuth()
-        self.media_endpoint_url = 'https://upload.twitter.com/1.1/media/upload.json'
-        self.post_tweet_url = 'https://api.twitter.com/1.1/statuses/update.json'
+    def get_twitter_conn_v1(self) -> tweepy.API:
+        auth = tweepy.OAuth1UserHandler(self.api_key, self.api_secret)
+        auth.set_access_token(self.access_token, self.access_token_secret)
+        return tweepy.API(auth)
 
-    def tweet(self):
-        '''
-        Publishes Tweet with attached image
-        '''
-        image_path = self.image_filename
-        with open(image_path, "rb") as image_file:
-            files = {"media": image_file}
-            req = requests.post(self.media_endpoint_url, 
-                                files=files, auth=self.oauth)
-            self.media_id = req.json()["media_id"]
+    def get_twitter_conn_v2(self) -> tweepy.Client:
+        client = tweepy.Client(
+            consumer_key=self.api_key,
+            consumer_secret=self.api_secret,
+            access_token=self.access_token,
+            access_token_secret=self.access_token_secret,
+        )
+        return client
 
-        status = self.image_filename.split("_")[0]
+    def tweet(self, media_path):
+        client_v1 = self.get_twitter_conn_v1()
+        client_v2 = self.get_twitter_conn_v2()
 
-        request_data = {
-            'status': '【Oshi no Ko】' + status,
-            'media_ids': self.media_id
-        }
-        req = requests.post(self.post_tweet_url, data=request_data, auth=self.oauth)
-        print(req.json())
-        os.remove(self.image_filename)
+        media = client_v1.media_upload(filename=media_path)
+        status = media_path.split("_")[0]
+        media_id = media.media_id
+
+        client_v2.create_tweet(text=status, media_ids=[media_id])
