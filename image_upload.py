@@ -30,7 +30,7 @@ class ImageTweet:
         client_v2 = self.get_twitter_conn_v2()
 
         media = client_v1.media_upload(filename=media_path)
-        status = media_path.split("_")[0]
+        status = "【Oshi no Ko】 " + media_path.split("_")[0]
         media_id = media.media_id
 
         client_v2.create_tweet(text=status, media_ids=[media_id])
