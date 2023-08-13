@@ -30,19 +30,21 @@ def auth():
 def tweet():
 
     file = getRandomFile()
+    print(file)
 
     if file['extension'] == 'mp4':
         videoTweet = VideoTweet(file['title'])
         videoTweet.tweet()
 
-    if file['extension'] == 'png':
-        imageTweet = ImageTweet(file['title'])
-        imageTweet.tweet()
+    if file['extension'] == 'png' or file['extension'] == 'jpg':
+        imageTweet = ImageTweet()
+        imageTweet.tweet(file['title'])
+        os.remove(file['title'])
 
 def ping():
 
     try:
-        r = requests.head("https://oshi.onrender.com")
+        r = requests.head("https://csmsc.onrender.com")
         print(r.status_code)
 
     except requests.ConnectionError:
